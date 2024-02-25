@@ -1,3 +1,4 @@
+import argparse
 from dotenv import load_dotenv
 from os import getenv, listdir, path
 import spotipy
@@ -8,73 +9,89 @@ from warnings import warn
 load_dotenv()
 
 
-def get_list(data: list, list_type: str) -> str:
-    if len(data) < 1:
-        if list_type == "db":
-            raise FileNotFoundError(".db file not found.")
-        else:
-            raise sqlite3.OperationalError("Playlist not found. ")
-    elif len(data) > 1:
-        while True:
-            print(f"Which {list_type} to select? ")
-            for k, v in enumerate(data):
-                if list_type == "db":
-                    print(f"{k + 1}. {v}")
+class DBHandle:
+    def __init__(self, database_path: str, ):
+        self.database_path = database_path
+        self.database_conn = sqlite3.connect(database_path)
+        self.database_cur = self.database_conn.cursor()
+
+    def get_playlists(self):
+        self.database_cur.execute('SELECT * FROM Playlist')
+        return self.database_cur.fetchall()
+
+    def get_songs_all(self):
+        self.database_cur.execute("SELECT * FROM Song")
+        return self.database_cur.fetchall()
+
+    def get_songs_playlist(self, playlist_id: str, ):
+        self.database_cur.execute("""SELECT * FROM Song INNER JOIN SongPlaylistMap on Song.id = SongPlaylistMap.songId 
+                                  WHERE SongPlaylistMap.playlistId = ?""", (playlist_id,))
+        return self.database_cur.fetchall()
+
+
+class SpotifyConverter:
+    def __init__(self, spotipy_creds: dict, verbose=False):
+        self.spotipy_instance = spotipy.Spotify(
+            auth_manager=SpotifyOAuth(
+                scope="playlist-modify-private playlist-modify-public",
+                redirect_uri=spotipy_creds['redirect_uri'],
+                client_id=spotipy_creds['client_id'],
+                client_secret=spotipy_creds['client_secret'],
+            )
+        )
+        self.verbose = verbose
+
+    def vimusic_to_spotify_playlist(self, playlist_uri: str, songs: list):
+        songs_uri = []
+        song_names = [s[1] for s in songs]
+        for song in song_names:
+            result = self.spotipy_instance.search(q=f"track:{song}", type="track", limit=1)
+            for result_track in result['tracks']['items']:
+                songs_uri.append(result_track['uri'])
+        print(songs_uri)
+        self.spotipy_instance.playlist_add_items(playlist_id=playlist_uri, items=songs_uri)
+
+
+def main():
+    vimusic_dbs = [f for f in listdir() if path.isfile(f) and '.db' in f]
+
+    parser = argparse.ArgumentParser(description="Convert ViMusic Playlists to Other Platforms (Currently supports "
+                                                 "ViMusic to Spotify)")
+
+    parser.add_argument('database', type=str, choices=vimusic_dbs, help='The ViMusic Database file to read.')
+    parser.add_argument('platform', type=str, choices=['spotify'], help="The platform to convert to: ['spotify'].")
+
+    args = parser.parse_args()
+
+    match args.platform:
+        case "spotify":
+            spotipy_creds = {
+                "redirect_uri": getenv('SPOTIPY_REDIRECT_URI'),
+                "client_id": getenv('SPOTIPY_CLIENT_ID'),
+                "client_secret": getenv('SPOTIPY_CLIENT_SECRET'),
+            }
+
+            db_handler = DBHandle(args.database)
+            playlists = db_handler.get_playlists()
+            songs = None
+            while True:
+                for playlist in playlists:
+                    print(f"{playlist[0]}. {playlist[1]}")
+                playlist_input = input("Which playlist to select: ")
+                try:
+                    playlist_r = playlists[int(playlist_input)-1]
+                    playlist_id = playlist_r[0]
+                    songs = db_handler.get_songs_playlist(playlist_id)
+                except ValueError:
+                    warn("Not a number; please try again.")
+                except IndexError:
+                    warn("Not an option; please try again.")
                 else:
-                    print(f"{k + 1}. {v[1]}")
-            x = input(f"Which {list_type} to select? ")
-            try:
-                return data[(int(x) - 1)]
-            except ValueError:
-                warn("Not a number; please try again.")
-            except IndexError:
-                warn("Not an option; please try again")
-    else:
-        return data[0]
+                    break
+
+            spotify_converter = SpotifyConverter(spotipy_creds)
+            spotify_converter.vimusic_to_spotify_playlist(getenv('SPOTIPY_PLAYLIST_URI'), songs)
 
 
-def get_songs():
-    cur.execute("SELECT * FROM Playlist")
-    playlists = cur.fetchall()
-
-    playlist = get_list(playlists, "playlist")
-
-    # cur.execute("SELECT * FROM SongPlaylistMap WHERE playlistid = ?", (playlist[0],))
-    cur.execute("SELECT * FROM Song INNER JOIN SongPlaylistMap ON Song.id = SongPlaylistMap.songId WHERE "
-                "SongPlaylistMap.playlistid = ?", (playlist[0],))
-    return playlist, cur.fetchall()
-
-
-vimusic_dbs = [f for f in listdir() if path.isfile(f) and '.db' in f]
-db = get_list(vimusic_dbs, "db")
-
-conn = sqlite3.connect(db)
-cur = conn.cursor()
-
-songs = get_songs()
-
-song_names = [x[1] for x in songs[1]]
-pl = songs[0][1]
-
-scope = "playlist-modify-private"
-
-sp = spotipy.Spotify(
-    auth_manager=SpotifyOAuth(
-        scope="playlist-modify-private playlist-modify-public",
-        redirect_uri=getenv('SPOTIPY_REDIRECT_URI'),
-        client_id=getenv('SPOTIPY_CLIENT_ID'),
-        client_secret=getenv('SPOTIPY_CLIENT_SECRET'),
-    )
-)
-
-pl_uri = input(
-    'Go to Spotify, create a new playlist, and copy & paste playlist playlist URL Code here (the code is the part of '
-    'the playlist url that comes after "/playlist/":')
-songs_uri = []
-for s in song_names:
-    results = sp.search(q=f'track:{s}', type='track', limit=1)
-    for track in results['tracks']['items']:
-        print(f"Adding \033[1;96m'{track['name']}'\033[0m to playlist \033[1;96m'{pl}'\033[0m...")
-        songs_uri.append(track['uri'])
-print(songs_uri)
-sp.playlist_add_items(playlist_id=pl_uri, items=songs_uri)
+if __name__ == "__main__":
+    main()
