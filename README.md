@@ -20,23 +20,31 @@ python -m virtualenv venv
 pip -r requirements.txt
 ```
 ## Usage
+Backup your ViMusic and copy the `.db` file to the current directory, and run:
+```
+python main.py <ViMusic .db file> <platform> <extra_args>
+```
+### For Spotify
 
 * **Go to https://developer.spotify.com/dashboard and create an app with a redirect URI (default: https://localhost:8888/callback)**
 * **Copy the client ID and execute: where `<client ID>` is replaced by the copied client ID**
 ```
-echo 'SPOTIPY_CLIENT_ID = "<client ID>"
+echo 'SPOTIPY_CLIENT_ID = "<client ID>"' >> .env
 ```
 * **Copy the client secret and execute: where `<client secret>` is replaced by the copied client secret**
 ```
-echo 'SPOTIPY_CLIENT_SECRET = "<client secret>"
+echo 'SPOTIPY_CLIENT_SECRET = "<client secret>"' >> .env
 ```
 * **Copy the redirect URI and execute: where `<redirect URI>` is replaced by the copied redirect URI**
 ```
-echo 'SPOTIPY_REDIRECT_URI = "<redirect URI>"
+echo 'SPOTIPY_REDIRECT_URI = "<redirect URI>"' >> .env
 ```
-* **Backup your ViMusic and copy the `.db` file to the current directory**
-* **Create a Spotify Playlist and copy it's code from the URL (the code is `<code>` in `https://spotify.com/playlist/<code>`). Keep the code ready for later use.**
-* **Run the program and follow the directed steps. When it says to paste the playlist URL, paste the code that was copied earlier**
-* ```
-  python main.py
-  ```
+* **Create a Spotify Playlist and copy it's code from the URL (the code is `<code>` in `https://spotify.com/playlist/<code>`). Execute: where `<playlist_code>` is replaced by the copied code**
+```
+echo 'SPOTIPY_PLAYLIST_URI = "<playlist_code>"' >> .env
+```
+
+* ** Run program:**
+```
+python main.py <ViMusic .db file> spotify
+```
