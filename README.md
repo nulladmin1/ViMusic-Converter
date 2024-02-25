@@ -44,7 +44,7 @@ echo 'SPOTIPY_REDIRECT_URI = "<redirect URI>"' >> .env
 echo 'SPOTIPY_PLAYLIST_URI = "<playlist_code>"' >> .env
 ```
 
-* ** Run program:**
+* **Run program:**
 ```
 python main.py <ViMusic .db file> spotify
 ```
