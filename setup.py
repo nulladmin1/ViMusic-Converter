@@ -25,6 +25,7 @@ setup(
     author_email="shrey.deogade@protonmail.com",
     description="Convert ViMusic Playlists into playlists for other platforms",
     long_description=LONG_DESCRIPTION,
+    long_description_content_type='text/markdown',
     packages=find_packages(),
     install_requires=['python-dotenv', 'requests', 'spotipy'],
     classifiers=[
