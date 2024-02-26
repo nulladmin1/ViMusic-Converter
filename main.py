@@ -9,7 +9,7 @@ from warnings import warn
 load_dotenv()
 
 
-class DBHandle:
+class ViMusicDBHandler:
     def __init__(self, database_path: str, ):
         self.database_path = database_path
         self.database_conn = sqlite3.connect(database_path)
@@ -71,7 +71,7 @@ def main():
                 "client_secret": getenv('SPOTIPY_CLIENT_SECRET'),
             }
 
-            db_handler = DBHandle(args.database)
+            db_handler = ViMusicDBHandler(args.database)
             playlists = db_handler.get_playlists()
             songs = None
             while True:
