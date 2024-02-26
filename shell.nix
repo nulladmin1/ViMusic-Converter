@@ -8,6 +8,7 @@ in pkgs.mkShell {
       python-dotenv
       requests
       spotipy
+      setuptools
       venvShellHook
     ];
     src = null;

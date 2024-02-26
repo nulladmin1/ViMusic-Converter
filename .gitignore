@@ -1,6 +1,9 @@
+
+*.db
+build/
+dist/
 venv/
 .idea/
-.env
+vimusic_converter.egg-info/
 .cache
-*.db
-vimusic*.db*
+.env
