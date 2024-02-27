@@ -2,9 +2,28 @@
 ViMusic-Converter is a Python script converting ViMusic playlists to playlists in other platforms. (Currently only supports Spotify)
 
 ## Installation
+### From PyPI (recommended)
 
 ```
 pip install vimusic-converter
+```
+### Build from source:
+
+* **Clone this repo**
+```
+git clone https://github.com/nulladmin1/ViMusic-Converter.git
+````
+* **CD into repo**
+```
+cd "ViMusic-Converter"
+```
+* **Build project**
+```
+python setup.py bdist_wheel sdist
+```
+* **Install using Pip**
+```
+pip install .
 ```
 
 ## Usage
