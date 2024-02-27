@@ -1,14 +1,22 @@
 import spotipy
+from dataclasses import dataclass
+
+
+@dataclass
+class SpotifyCreds:
+    redirect_uri: str
+    client_id: str
+    client_secret: str
 
 
 class SpotifyConverter:
-    def __init__(self, spotipy_creds: dict, verbose=False):
+    def __init__(self, spotipy_creds: SpotifyCreds, verbose=False):
         self.spotipy_instance = spotipy.Spotify(
             auth_manager=spotipy.oauth2.SpotifyOAuth(
                 scope="playlist-modify-private playlist-modify-public",
-                redirect_uri=spotipy_creds['redirect_uri'],
-                client_id=spotipy_creds['client_id'],
-                client_secret=spotipy_creds['client_secret'],
+                redirect_uri=spotipy_creds.redirect_uri,
+                client_id=spotipy_creds.client_id,
+                client_secret=spotipy_creds.client_secret,
             )
         )
         self.verbose = verbose

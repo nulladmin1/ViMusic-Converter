@@ -1,5 +1,4 @@
 import argparse
-import sqlite3
 from os import getenv, listdir, path
 from dotenv import dotenv_values
 from warnings import warn
@@ -8,7 +7,6 @@ from .dbhandler import ViMusicDBHandler
 
 
 def main():
-
     vimusic_dbs = [f for f in listdir() if path.isfile(f) and '.db' in f]
 
     parser = argparse.ArgumentParser(description="Convert ViMusic Playlists to Other Platforms (Currently supports "
@@ -22,21 +20,21 @@ def main():
 
     match args.platform:
         case "spotify":
-            from .spotify import SpotifyConverter
+            from .spotify import SpotifyConverter, SpotifyCreds
 
             if args.dotenv:
                 secrets = dotenv_values('.env')
-                spotipy_creds = {
-                    "redirect_uri": secrets['SPOTIPY_REDIRECT_URI'],
-                    "client_id": secrets['SPOTIPY_CLIENT_ID'],
-                    "client_secret": secrets['SPOTIPY_CLIENT_SECRET'],
-                }
+                spotipy_creds = SpotifyCreds(
+                    redirect_uri=secrets['SPOTIPY_REDIRECT_URI'],
+                    client_id=secrets['SPOTIPY_CLIENT_ID'],
+                    client_secret=secrets['SPOTIPY_CLIENT_SECRET'],
+                )
             else:
-                spotipy_creds = {
-                    "redirect_uri": getenv('SPOTIPY_REDIRECT_URI'),
-                    "client_id": getenv('SPOTIPY_CLIENT_ID'),
-                    "client_secret": getenv('SPOTIPY_CLIENT_SECRET'),
-                }
+                spotipy_creds = SpotifyCreds(
+                    redirect_uri=getenv('SPOTIPY_REDIRECT_URI'),
+                    client_id=getenv('SPOTIPY_CLIENT_ID'),
+                    client_secret=getenv('SPOTIPY_CLIENT_SECRET'),
+                )
 
             db_handler = ViMusicDBHandler(args.database)
             playlists = db_handler.get_playlists()
@@ -46,7 +44,7 @@ def main():
                     print(f"{playlist[0]}. {playlist[1]}")
                 playlist_input = input("Which playlist to select: ")
                 try:
-                    playlist_r = playlists[int(playlist_input)-1]
+                    playlist_r = playlists[int(playlist_input) - 1]
                     playlist_id = playlist_r[0]
                     songs = db_handler.get_songs_playlist(playlist_id)
                 except ValueError:
