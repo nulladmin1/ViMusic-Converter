@@ -1,14 +1,13 @@
 import argparse
-from dotenv import load_dotenv
+import sqlite3
 from os import getenv, listdir, path
+from dotenv import dotenv_values
 from warnings import warn
 
 from .dbhandler import ViMusicDBHandler
 
 
 def main():
-
-    load_dotenv()
 
     vimusic_dbs = [f for f in listdir() if path.isfile(f) and '.db' in f]
 
@@ -17,19 +16,27 @@ def main():
 
     parser.add_argument('database', type=str, choices=vimusic_dbs, help='The ViMusic Database file to read.')
     parser.add_argument('platform', type=str, choices=['spotify'], help="The platform to convert to: ['spotify'].")
+    parser.add_argument('--dotenv', action='store_true', help='ENV FILE')
 
     args = parser.parse_args()
 
     match args.platform:
         case "spotify":
-
             from .spotify import SpotifyConverter
 
-            spotipy_creds = {
-                "redirect_uri": getenv('SPOTIPY_REDIRECT_URI'),
-                "client_id": getenv('SPOTIPY_CLIENT_ID'),
-                "client_secret": getenv('SPOTIPY_CLIENT_SECRET'),
-            }
+            if args.dotenv:
+                secrets = dotenv_values('.env')
+                spotipy_creds = {
+                    "redirect_uri": secrets['SPOTIPY_REDIRECT_URI'],
+                    "client_id": secrets['SPOTIPY_CLIENT_ID'],
+                    "client_secret": secrets['SPOTIPY_CLIENT_SECRET'],
+                }
+            else:
+                spotipy_creds = {
+                    "redirect_uri": getenv('SPOTIPY_REDIRECT_URI'),
+                    "client_id": getenv('SPOTIPY_CLIENT_ID'),
+                    "client_secret": getenv('SPOTIPY_CLIENT_SECRET'),
+                }
 
             db_handler = ViMusicDBHandler(args.database)
             playlists = db_handler.get_playlists()
