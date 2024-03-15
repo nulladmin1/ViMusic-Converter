@@ -29,7 +29,7 @@ pip install .
 ## Usage
 Backup your ViMusic and copy the `.db` file to the current directory.
 ```
-python main.py <vimusic .db file> <platform> <extra_args>
+python -m vimusic_converter <vimusic .db file> <platform> <extra_args>
 ```
 ### For Spotify
 
@@ -77,5 +77,5 @@ export 'SPOTIPY_PLAYLIST_URI = "<playlist_code>"'
 ```
 * **Run program:**
 ```
-python main.py <vimusic .db file> spotify
+python -m vimusic_converter <vimusic .db file> spotify
 ```
