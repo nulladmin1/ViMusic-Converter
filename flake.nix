@@ -17,6 +17,8 @@
           buildInputs = with pkgs; [
             # Python packages
             python311
+            python311Packages.build
+            python311Packages.pip
             python311Packages.python-dotenv
             python311Packages.requests
             python311Packages.spotipy
