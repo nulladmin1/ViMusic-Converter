@@ -1,0 +1,9 @@
+##[pylyzer] failed /home/shreyd/Code/Python/vimusic-converter/vimusic_converter/spotify.py 1708979445 1003
+.spotipy = pyimport "spotipy"
+
+.SpotifyConverter: ClassType
+.SpotifyConverter.spotipy_instance: Never
+.SpotifyConverter.verbose: Never
+.SpotifyConverter.__call__: (spotipy_instance: Obj, verbose: Obj) -> .SpotifyConverter
+.SpotifyConverter.vimusic_to_spotify_playlist: (self: .SpotifyConverter, playlist_uri: Str, songs: GenericArray) -> Never
+

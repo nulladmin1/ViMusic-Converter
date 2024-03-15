@@ -1,0 +1,12 @@
+##[pylyzer] failed /home/shreyd/Code/Python/vimusic-converter/vimusic_converter/dbhandler.py 1708979445 820
+.sqlite3 = pyimport "sqlite3"
+
+.ViMusicDBHandler: ClassType
+.ViMusicDBHandler.database_conn: Never
+.ViMusicDBHandler.database_path: Str
+.ViMusicDBHandler.database_cur: Never
+.ViMusicDBHandler.__call__: (database_path: Str, database_conn: Obj, database_cur: Obj) -> .ViMusicDBHandler
+.ViMusicDBHandler.get_playlists: (self: .ViMusicDBHandler) -> Never
+.ViMusicDBHandler.get_songs_all: (self: .ViMusicDBHandler) -> Never
+.ViMusicDBHandler.get_songs_playlist: (self: .ViMusicDBHandler, playlist_id: Str) -> Never
+
