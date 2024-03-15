@@ -11,6 +11,7 @@ description = "Convert ViMusic playlists into playlists for other platforms. "
 readme = "README.md"
 requires-python = ">=3.8"
 dynamic = ["version"]
+license = {file = "LICENSE"}
 dependencies = [
   "python-dotenv",
   "requests",
