@@ -25,5 +25,22 @@
             python311Packages.setuptools
           ];
         };
+
+    defaultPackage.${system} = pkgs.python311.pkgs.buildPythonApplication rec {
+        pname = "vimusic_converter";
+        version = ./src/vimusic_converter/version;
+        
+        format = "pyproject";
+        src = ./.;
+
+        propagatedBuildInputs = with pkgs.python311Packages; [
+          python-dotenv
+          requests
+          spotipy
+
+          setuptools
+        ];
+      };
+
   };
 }
