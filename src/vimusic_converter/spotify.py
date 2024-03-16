@@ -27,6 +27,7 @@ class SpotifyConverter:
         for song in song_names:
             result = self.spotipy_instance.search(q=f"track:{song}", type="track", limit=1)
             for result_track in result['tracks']['items']:
+                print(result_track)
                 songs_uri.append(result_track['uri'])
         print(songs_uri)
         self.spotipy_instance.playlist_add_items(playlist_id=playlist_uri, items=songs_uri)
