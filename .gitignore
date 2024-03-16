@@ -8,3 +8,4 @@ vimusic_converter.egg-info/
 .cache
 .env
 */__pycache__/
+result
